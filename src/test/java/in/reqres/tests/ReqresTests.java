@@ -1,52 +1,55 @@
 package in.reqres.tests;
 
+import in.reqres.models.lombok.GetUserResponseLombokModel;
+import in.reqres.models.lombok.GetUsersListResponseLombokModel;
+import in.reqres.models.lombok.UserCreationBodyLombokModel;
+import in.reqres.models.lombok.UserCreationResponseLombokModel;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-import static io.restassured.RestAssured.get;
+import static in.reqres.specs.Specs.request;
+import static in.reqres.specs.Specs.responseSpecification;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
 
 public class ReqresTests {
 
     @Test
     void checkIfPageNumberUsersListIsCorrect() {
-        given()
-                .log().uri()
-                .log().method()
+        GetUsersListResponseLombokModel response = given()
+                .spec(request)
                 .when()
                 .get("https://reqres.in/api/users?page=1")
                 .then()
-                .log().body()
-                .log().status()
+                .spec(responseSpecification)
                 .statusCode(200)
-                .body("page", is(1));
+                .extract().as(GetUsersListResponseLombokModel.class);
+
+        assertEquals(response.getPage(), 1);
     }
 
     @Test
     void checkUserInfo() {
-        given()
-                .log().uri()
-                .log().method()
+        GetUserResponseLombokModel response = given()
+                .spec(request)
                 .when()
                 .get("https://reqres.in/api/users/2")
                 .then()
-                .log().body()
-                .log().status()
+                .spec(responseSpecification)
                 .statusCode(200)
-                .body("data.id", is(2),
-                        "data.email", is("janet.weaver@reqres.in"),
-                        "data.first_name", is("Janet"),
-                        "data.last_name", is("Weaver"),
-                        "data.avatar", is("https://reqres.in/img/faces/2-image.jpg"));
+                .extract().as(GetUserResponseLombokModel.class);
+
+        assertEquals(response.getData().getId(), 2);
+        assertEquals(response.getData().getEmail(), "janet.weaver@reqres.in");
+        assertEquals(response.getData().getFirstName(), "Janet");
+        assertEquals(response.getData().getLastName(), "Weaver");
+        assertEquals(response.getData().getAvatar(), "https://reqres.in/img/faces/2-image.jpg");
     }
 
     @Test
     void checkStatusCodeIfUserDoesNotExist() {
         given()
-                .log().uri()
-                .log().method()
+                .spec(request)
                 .when()
                 .get("https://reqres.in/api/users/23")
                 .then()
@@ -56,59 +59,55 @@ public class ReqresTests {
 
     @Test
     void checkSuccessfulUserCreation() {
-        String data = "{ \"name\": \"morpheus\", \"job\": \"leader\" }";
 
-        given()
-                .log().uri()
-                .log().method()
-                .contentType(JSON)
-                .body(data)
+        UserCreationBodyLombokModel user = new UserCreationBodyLombokModel();
+        user.setName("morpheus");
+        user.setJob("leader");
+
+        UserCreationResponseLombokModel response = given()
+                .spec(request)
+                .body(user)
                 .when()
                 .post("https://reqres.in/api/users")
                 .then()
-                .log().body()
-                .log().status()
+                .spec(responseSpecification)
                 .statusCode(201)
-                .body("name", is("morpheus"),
-                        "job", is("leader"));
+                .extract().as(UserCreationResponseLombokModel.class);
+
+        assertEquals(user.getName(), response.getName());
     }
 
     @Test
     void checkSuccessfulUserDeleting() {
-        String data = "{ \"name\": \"morpheus\", \"job\": \"leader\" }";
+        UserCreationBodyLombokModel user = new UserCreationBodyLombokModel();
+        user.setName("morpheus");
+        user.setJob("leader");
 
-        String userId = given()
-                .log().uri()
-                .log().method()
-                .contentType(JSON)
-                .body(data)
+        UserCreationResponseLombokModel response = given()
+                .spec(request)
+                .body(user)
                 .when()
                 .post("https://reqres.in/api/users")
                 .then()
-                .log().body()
-                .log().status()
+                .spec(responseSpecification)
                 .statusCode(201)
-                .extract().path("id");
+                .extract().as(UserCreationResponseLombokModel.class);
 
         given()
-                .log().uri()
-                .log().method()
+                .spec(request)
                 .when()
-                .delete("https://reqres.in/api/users/" + userId)
+                .delete("https://reqres.in/api/users/" + response.getId())
                 .then()
-                .log().body()
-                .log().status()
+                .spec(responseSpecification)
                 .statusCode(204)
                 .body(Matchers.anything());
 
         given()
-                .log().uri()
-                .log().method()
+                .spec(request)
                 .when()
-                .get("https://reqres.in/api/users/" + userId)
+                .get("https://reqres.in/api/users/" + response.getId())
                 .then()
-                .log().body()
-                .log().status()
+                .spec(responseSpecification)
                 .statusCode(404)
                 .body(Matchers.anything());
     }
