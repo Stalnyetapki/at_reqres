@@ -37,7 +37,8 @@ dependencies {
             "io.qameta.allure:allure-rest-assured:$allureVersion",
             "org.assertj:assertj-core:$assertJVersion",
             "com.fasterxml.jackson.core:jackson-databind:2.14.1",
-            'com.google.code.gson:gson:2.10'
+            'com.google.code.gson:gson:2.10',
+            "com.codeborne:selenide:6.10.1"
     )
 }
 

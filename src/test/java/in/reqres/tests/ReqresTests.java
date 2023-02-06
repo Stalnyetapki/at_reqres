@@ -12,14 +12,14 @@ import static in.reqres.specs.Specs.responseSpecification;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static io.restassured.RestAssured.given;
 
-public class ReqresTests {
+public class ReqresTests extends TestBase{
 
     @Test
     void checkIfPageNumberUsersListIsCorrect() {
         GetUsersListResponseLombokModel response = given()
                 .spec(request)
                 .when()
-                .get("https://reqres.in/api/users?page=1")
+                .get("/users?page=1")
                 .then()
                 .spec(responseSpecification)
                 .statusCode(200)
@@ -33,7 +33,7 @@ public class ReqresTests {
         GetUserResponseLombokModel response = given()
                 .spec(request)
                 .when()
-                .get("https://reqres.in/api/users/2")
+                .get("/users/2")
                 .then()
                 .spec(responseSpecification)
                 .statusCode(200)
@@ -51,7 +51,7 @@ public class ReqresTests {
         given()
                 .spec(request)
                 .when()
-                .get("https://reqres.in/api/users/23")
+                .get("/users/23")
                 .then()
                 .log().status()
                 .statusCode(404);
@@ -68,7 +68,7 @@ public class ReqresTests {
                 .spec(request)
                 .body(user)
                 .when()
-                .post("https://reqres.in/api/users")
+                .post("/users")
                 .then()
                 .spec(responseSpecification)
                 .statusCode(201)
@@ -87,7 +87,7 @@ public class ReqresTests {
                 .spec(request)
                 .body(user)
                 .when()
-                .post("https://reqres.in/api/users")
+                .post("/users")
                 .then()
                 .spec(responseSpecification)
                 .statusCode(201)
@@ -96,7 +96,7 @@ public class ReqresTests {
         given()
                 .spec(request)
                 .when()
-                .delete("https://reqres.in/api/users/" + response.getId())
+                .delete("/users/" + response.getId())
                 .then()
                 .spec(responseSpecification)
                 .statusCode(204)
@@ -105,7 +105,7 @@ public class ReqresTests {
         given()
                 .spec(request)
                 .when()
-                .get("https://reqres.in/api/users/" + response.getId())
+                .get("/users/" + response.getId())
                 .then()
                 .spec(responseSpecification)
                 .statusCode(404)
