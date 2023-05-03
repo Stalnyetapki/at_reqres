@@ -12,6 +12,8 @@ import static io.restassured.http.ContentType.JSON;
 
 public class Specs {
     public static RequestSpecification request = with()
+            .baseUri("https://reqres.in")
+            .basePath("/api")
             .log().uri()
             .log().method()
             .filter(withCustomTemplates())

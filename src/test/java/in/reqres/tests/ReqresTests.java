@@ -12,7 +12,7 @@ import static in.reqres.specs.Specs.responseSpecification;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static io.restassured.RestAssured.given;
 
-public class ReqresTests extends TestBase{
+public class ReqresTests{
 
     @Test
     void checkIfPageNumberUsersListIsCorrect() {
